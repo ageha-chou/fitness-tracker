@@ -1,1 +1,90 @@
-<p>signup works!</p>
+<section class="signup-form">
+  <form
+    fxLayout="column"
+    fxLayoutAlign="center center"
+    fxLayoutGap="12px"
+    #f="ngForm"
+    (ngSubmit)="onSubmit(f)"
+  >
+    <h3>Sign Up</h3>
+    <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input
+        type="email"
+        matInput
+        placeholder="Your email"
+        name="email"
+        ngModel
+        required
+        email
+        #emailInput="ngModel"
+      />
+      <mat-error *ngIf="emailInput.hasError('required')">
+        Email is required
+      </mat-error>
+      <mat-error *ngIf="emailInput.hasError('email')">
+        Email is invalid
+      </mat-error>
+    </mat-form-field>
+    <!-- <mat-form-field hintLabel="Should be at least 6 characters long"> -->
+    <mat-form-field>
+      <mat-label>Password</mat-label>
+      <input
+        type="password"
+        matInput
+        placeholder="Your password"
+        name="password"
+        ngModel
+        required
+        minlength="6"
+        #pwdInput="ngModel"
+      />
+      <!-- <mat-hint align="end">{{ pwdInput.value?.length }}/ 6</mat-hint> -->
+      <mat-error *ngIf="pwdInput.hasError('required')">
+        Password is required
+      </mat-error>
+      <mat-error *ngIf="pwdInput.hasError('minlength')">
+        Password has at least 6 characters long
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Birthdate</mat-label>
+      <input
+        matInput
+        [matDatepicker]="dobPicker"
+        placeholder="dd/MM/yyyy"
+        [max]="maxDate"
+        name="dob"
+        ngModel
+        required
+        #dobInput="ngModel"
+      />
+      <mat-datepicker-toggle matSuffix [for]="dobPicker">
+      </mat-datepicker-toggle>
+      <mat-datepicker #dobPicker></mat-datepicker>
+      <mat-error *ngIf="dobInput.hasError('required')">
+        Birthdate is required
+      </mat-error>
+    </mat-form-field>
+    <mat-checkbox
+      name="term"
+      color="primary"
+      ngModel
+      required
+      #termCheck="ngModel"
+    >
+      Agree to Terms and Conditions.
+    </mat-checkbox>
+    <!-- <mat-error *ngIf="termCheck.hasError('required') && f.submitted">
+      Please agree with the terms
+    </mat-error> -->
+    <button
+      type="submit"
+      mat-raised-button
+      color="primary"
+      [disabled]="!f.valid"
+    >
+      Sign up
+    </button>
+  </form>
+</section>
