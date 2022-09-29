@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   isLoading = false;
-  private loadingSub!: Subscription;
+  private loadingSub: Subscription | undefined;
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +37,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.loadingSub.unsubscribe();
+    this.loadingSub?.unsubscribe();
   }
 }

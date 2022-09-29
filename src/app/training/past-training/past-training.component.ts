@@ -20,7 +20,7 @@ import { TrainingService } from '../training.service';
 export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns = ['date', 'name', 'calories', 'duration', 'state'];
   dataSource = new MatTableDataSource<Exercise>();
-  finishedExerciseSub!: Subscription;
+  finishedExerciseSub: Subscription | undefined;
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -46,6 +46,6 @@ export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.finishedExerciseSub.unsubscribe();
+    this.finishedExerciseSub?.unsubscribe();
   }
 }

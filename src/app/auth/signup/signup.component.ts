@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
 export class SignupComponent implements OnInit, OnDestroy {
   maxDate: Date | undefined;
   isLoading = false;
-  private loadingSub!: Subscription;
+  private loadingSub: Subscription | undefined;
 
   constructor(private authService: AuthService, private uiService: UIService) {}
 
@@ -35,6 +35,6 @@ export class SignupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.loadingSub.unsubscribe();
+    this.loadingSub?.unsubscribe();
   }
 }

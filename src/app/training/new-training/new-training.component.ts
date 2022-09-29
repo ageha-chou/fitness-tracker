@@ -12,9 +12,9 @@ import { UIService } from 'src/app/shared/ui.service';
 })
 export class NewTrainingComponent implements OnInit, OnDestroy {
   exercises: Exercise[] | undefined = [];
-  exercisesSub!: Subscription;
+  private exercisesSub: Subscription | undefined;
   isLoading = false;
-  private loadingSub!: Subscription;
+  private loadingSub: Subscription | undefined;
 
   constructor(
     private trainingService: TrainingService,
@@ -47,7 +47,7 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.loadingSub.unsubscribe();
-    this.exercisesSub.unsubscribe();
+    this.loadingSub?.unsubscribe();
+    this.exercisesSub?.unsubscribe();
   }
 }

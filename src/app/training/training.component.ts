@@ -11,7 +11,7 @@ import { TrainingService } from './training.service';
 export class TrainingComponent implements OnInit, OnDestroy {
   onGoingTraining = false;
   exercises: Exercise[] = [];
-  exerciseChangedSub!: Subscription;
+  exerciseChangedSub: Subscription | undefined;
 
   constructor(private trainingExercise: TrainingService) {}
 
@@ -24,6 +24,6 @@ export class TrainingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.exerciseChangedSub.unsubscribe();
+    this.exerciseChangedSub?.unsubscribe();
   }
 }
