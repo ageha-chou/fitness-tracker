@@ -1,22 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Subject, take } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { take } from 'rxjs';
 import { AuthData } from './auth-data.model';
 import { User } from './user.model';
 import { TrainingService } from '../training/training.service';
 import { UIService } from '../shared/ui.service';
+import * as fromRoot from '../app.reducer';
+import * as UI from '../shared/ui.actions';
+import * as Auth from './auth.actions';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  authChanged = new Subject<boolean>();
   private user: User | undefined;
 
   constructor(
     private router: Router,
     private auth: AngularFireAuth,
     private trainingService: TrainingService,
-    private uiService: UIService
+    private uiService: UIService,
+    private store: Store<{ ui: fromRoot.State }>
   ) {}
 
   initAuthListener() {
@@ -26,14 +30,14 @@ export class AuthService {
           email: user.email ?? '',
           userId: user.uid ?? '',
         };
-        this.authChanged.next(true);
+        this.store.dispatch(new Auth.SetAuthenticated());
         this.router.navigate(['/training']);
       }
     });
   }
 
   registerUser(authData: AuthData) {
-    this.uiService.loadingStateChanged.next(true);
+    this.store.dispatch(new UI.StartLoading());
     this.auth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
@@ -42,12 +46,12 @@ export class AuthService {
       })
       .catch((error) => this.handleError(error))
       .finally(() => {
-        this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
       });
   }
 
   login(authData: AuthData) {
-    this.uiService.loadingStateChanged.next(true);
+    this.store.dispatch(new UI.StartLoading());
     this.auth
       .signInWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
@@ -56,12 +60,12 @@ export class AuthService {
           email: result.user?.email ?? '',
           userId: result.user?.uid ?? '',
         };
-        this.authChanged.next(true);
+        this.store.dispatch(new Auth.SetAuthenticated());
         this.router.navigate(['/training']);
       })
       .catch((error) => this.handleError(error))
       .finally(() => {
-        this.uiService.loadingStateChanged.next(false);
+        this.store.dispatch(new UI.StopLoading());
       });
   }
 
@@ -69,7 +73,7 @@ export class AuthService {
     this.trainingService.cancelSubs();
     this.auth.signOut();
     this.user = undefined;
-    this.authChanged.next(false);
+    this.store.dispatch(new Auth.SetUnauthenticated());
     this.router.navigate(['/login']);
   }
 

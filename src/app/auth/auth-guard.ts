@@ -4,17 +4,17 @@ import {
   CanActivate,
   CanLoad,
   Route,
-  Router,
   RouterStateSnapshot,
-  UrlSegment,
   UrlTree,
 } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { AuthService } from './auth.service';
+import * as fromRoot from '../app.reducer';
+import { Store } from '@ngrx/store';
 
 @Injectable()
 export class AuthGuard implements CanActivate, CanLoad {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private store: Store<fromRoot.State>) {}
 
   canLoad(
     route: Route
@@ -23,11 +23,7 @@ export class AuthGuard implements CanActivate, CanLoad {
     | UrlTree
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree> {
-    if (this.authService.isAuth()) {
-      return true;
-    }
-
-    return this.router.createUrlTree(['/login']);
+    return this.store.select(fromRoot.getIsAuth).pipe(take(1));
   }
 
   canActivate(
@@ -38,10 +34,6 @@ export class AuthGuard implements CanActivate, CanLoad {
     | UrlTree
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree> {
-    if (this.authService.isAuth()) {
-      return true;
-    }
-
-    return this.router.createUrlTree(['/login']);
+    return this.store.select(fromRoot.getIsAuth).pipe(take(1));
   }
 }

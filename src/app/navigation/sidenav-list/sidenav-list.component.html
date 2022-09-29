@@ -5,7 +5,7 @@
     routerLinkActive="active"
     (click)="onCloseSidenav()"
     role="listitem"
-    *ngIf="!isAuth"
+    *ngIf="!(isAuth$ | async)"
   >
     <mat-icon>face</mat-icon>
     <span class="nav-caption">Signup</span>
@@ -16,7 +16,7 @@
     routerLinkActive="active"
     (click)="onCloseSidenav()"
     role="listitem"
-    *ngIf="!isAuth"
+    *ngIf="!(isAuth$ | async)"
   >
     <mat-icon>login</mat-icon>
     <span class="nav-caption">Login</span>
@@ -27,12 +27,12 @@
     routerLinkActive="active"
     (click)="onCloseSidenav()"
     role="listitem"
-    *ngIf="isAuth"
+    *ngIf="isAuth$ | async"
   >
     <mat-icon>fitness_center</mat-icon>
     <span class="nav-caption">Training</span>
   </a>
-  <mat-list-item *ngIf="isAuth">
+  <mat-list-item *ngIf="isAuth$ | async">
     <button mat-icon-button (click)="onLogout()">
       <mat-icon>logout</mat-icon>
       <span class="nav-caption">Logout</span>
