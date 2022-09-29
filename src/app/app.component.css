@@ -7,9 +7,3 @@ mat-sidenav {
 mat-sidenav {
   width: 250px;
 }
-
-.logo {
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  transform: scale(1, 0.8);
-}

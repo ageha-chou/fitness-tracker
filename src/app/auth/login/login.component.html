@@ -26,8 +26,14 @@
         formControlName="password"
       />
     </mat-form-field>
-    <button mat-raised-button color="primary" [disabled]="!loginForm.valid">
+    <button
+      *ngIf="!isLoading"
+      mat-raised-button
+      color="primary"
+      [disabled]="!loginForm.valid"
+    >
       Login
     </button>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
   </form>
 </section>

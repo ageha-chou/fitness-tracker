@@ -21,3 +21,9 @@ a:active {
   margin: 0;
   padding: 0;
 }
+
+.logo {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transform: scale(1, 0.8);
+}

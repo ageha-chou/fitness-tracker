@@ -5,6 +5,7 @@ import { Subject, take } from 'rxjs';
 import { AuthData } from './auth-data.model';
 import { User } from './user.model';
 import { TrainingService } from '../training/training.service';
+import { UIService } from '../shared/ui.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -14,7 +15,8 @@ export class AuthService {
   constructor(
     private router: Router,
     private auth: AngularFireAuth,
-    private trainingService: TrainingService
+    private trainingService: TrainingService,
+    private uiService: UIService
   ) {}
 
   initAuthListener() {
@@ -31,19 +33,21 @@ export class AuthService {
   }
 
   registerUser(authData: AuthData) {
+    this.uiService.loadingStateChanged.next(true);
     this.auth
       .createUserWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
         this.auth.signOut();
         this.router.navigate(['/login']);
       })
-      .catch((error) => {
-        console.log(error);
-        console.log(error.code);
+      .catch((error) => this.handleError(error))
+      .finally(() => {
+        this.uiService.loadingStateChanged.next(false);
       });
   }
 
   login(authData: AuthData) {
+    this.uiService.loadingStateChanged.next(true);
     this.auth
       .signInWithEmailAndPassword(authData.email, authData.password)
       .then((result) => {
@@ -55,8 +59,9 @@ export class AuthService {
         this.authChanged.next(true);
         this.router.navigate(['/training']);
       })
-      .catch((error) => {
-        console.log(error);
+      .catch((error) => this.handleError(error))
+      .finally(() => {
+        this.uiService.loadingStateChanged.next(false);
       });
   }
 
@@ -74,5 +79,25 @@ export class AuthService {
 
   isAuth() {
     return !!this.user;
+  }
+
+  handleError(error: any) {
+    let msg = 'Unknown error occurred';
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        msg = 'This email has already registered';
+        break;
+      case 'auth/weak-password':
+        msg = 'Password is not strong enough';
+        break;
+      case 'auth/user-not-found':
+        msg = 'The user not found';
+        break;
+      case 'auth/wrong-password':
+        msg = 'The password is not correct';
+        break;
+    }
+
+    this.uiService.showSnackbar(msg, undefined);
   }
 }

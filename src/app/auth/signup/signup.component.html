@@ -83,8 +83,10 @@
       mat-raised-button
       color="primary"
       [disabled]="!f.valid"
+      *ngIf="!isLoading"
     >
       Sign up
     </button>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
   </form>
 </section>

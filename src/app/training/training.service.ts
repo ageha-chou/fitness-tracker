@@ -1,21 +1,26 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { map, Subject, Subscription } from 'rxjs';
+import { UIService } from '../shared/ui.service';
 import { Exercise } from './exercies.model';
 
 @Injectable({ providedIn: 'root' })
 export class TrainingService {
-  private availableExercises: Exercise[] = [];
+  private availableExercises: Exercise[] | null = [];
   private runningExercise: Exercise | undefined;
 
   exerciseChanged = new Subject<Exercise | undefined>();
-  exercisesChanged = new Subject<Exercise[]>();
+  exercisesChanged = new Subject<Exercise[] | undefined>();
   finishedExercisesChanged = new Subject<Exercise[]>();
   private fbSubs: Subscription[] = [];
 
-  constructor(private firestore: AngularFirestore) {}
+  constructor(
+    private firestore: AngularFirestore,
+    private uiService: UIService
+  ) {}
 
   fetchAvailableExercises() {
+    this.uiService.loadingStateChanged.next(true);
     const sub = this.firestore
       .collection('availableExercises')
       .snapshotChanges()
@@ -29,9 +34,20 @@ export class TrainingService {
           });
         })
       )
-      .subscribe((exercises) => {
-        this.availableExercises = exercises;
-        this.exercisesChanged.next([...this.availableExercises]);
+      .subscribe({
+        next: (exercises) => {
+          this.uiService.loadingStateChanged.next(false);
+          this.availableExercises = exercises;
+          this.exercisesChanged.next([...this.availableExercises]);
+        },
+        error: (error) => {
+          console.log('error');
+          this.uiService.loadingStateChanged.next(false);
+          this.uiService.showSnackbar(
+            'Fetching data failed. Please try again later'
+          );
+          this.exercisesChanged.next(undefined);
+        },
       });
     this.fbSubs.push(sub);
   }
@@ -51,7 +67,7 @@ export class TrainingService {
   }
 
   startExercise(selectedId: string) {
-    this.runningExercise = this.availableExercises.find(
+    this.runningExercise = this.availableExercises?.find(
       (ex) => ex.id === selectedId
     );
     this.firestore
