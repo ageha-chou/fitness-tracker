@@ -14,7 +14,10 @@ export class SignupComponent implements OnInit {
   maxDate: Date | undefined;
   isLoading$!: Observable<boolean>;
 
-  constructor(private authService: AuthService, private store: Store) {}
+  constructor(
+    private authService: AuthService,
+    private store: Store<fromRoot.State>
+  ) {}
 
   ngOnInit(): void {
     this.isLoading$ = this.store.select(fromRoot.getIsLoading);

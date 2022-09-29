@@ -1,37 +1,36 @@
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Subscription } from 'rxjs';
 import { Exercise } from '../exercies.model';
 import { TrainingService } from '../training.service';
+import * as fromTraining from '../training.reducer';
+import { Store } from '@ngrx/store';
 
 @Component({
   selector: 'app-past-training',
   templateUrl: './past-training.component.html',
   styleUrls: ['./past-training.component.css'],
 })
-export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PastTrainingComponent implements OnInit, AfterViewInit {
   displayedColumns = ['date', 'name', 'calories', 'duration', 'state'];
   dataSource = new MatTableDataSource<Exercise>();
-  finishedExerciseSub: Subscription | undefined;
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private trainingService: TrainingService) {}
+  constructor(
+    private trainingService: TrainingService,
+    private store: Store<fromTraining.State>
+  ) {}
 
   ngOnInit(): void {
-    this.finishedExerciseSub =
-      this.trainingService.finishedExercisesChanged.subscribe((exercises) => {
-        this.dataSource.data = exercises;
+    this.store
+      .select(fromTraining.getFinishedTraining)
+      .subscribe((finishedExercises) => {
+        this.dataSource.data = finishedExercises;
       });
+
     this.trainingService.fetchFinishedExercises();
   }
 
@@ -43,9 +42,5 @@ export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLocaleLowerCase();
-  }
-
-  ngOnDestroy(): void {
-    this.finishedExerciseSub?.unsubscribe();
   }
 }
